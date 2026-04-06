@@ -422,6 +422,66 @@ export const DownloadIcon: React.FC<IconProps> = ({ size = 20, className = '' })
   </svg>
 );
 
+export const CheckCircle2Icon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 20 20"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    className={className}
+  >
+    <circle cx="10" cy="10" r="8" />
+    <polyline points="7 10 9 12 13 8" />
+  </svg>
+);
+
+export const CircleIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 20 20"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    className={className}
+  >
+    <circle cx="10" cy="10" r="8" />
+  </svg>
+);
+
+export const ArchiveIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 20 20"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    className={className}
+  >
+    <rect x="2" y="3" width="16" height="4" rx="1" />
+    <path d="M4 7v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7" />
+    <line x1="8" y1="11" x2="12" y2="11" />
+  </svg>
+);
+
+export const PlayCircleIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 20 20"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    className={className}
+  >
+    <circle cx="10" cy="10" r="8" />
+    <polygon points="8 7 14 10 8 13 8 7" fill="currentColor" stroke="none" />
+  </svg>
+);
+
 export const ShieldIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg
     width={size}

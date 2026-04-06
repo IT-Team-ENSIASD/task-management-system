@@ -7,7 +7,6 @@ import {
   LogoutIcon,
   MenuIcon,
   XIcon,
-  SparklesIcon,
   UserIcon,
 } from '../icons';
 
@@ -64,8 +63,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout, userName = 'User' })
       </button>
 
       {/* Desktop rail */}
-      <aside className="app-rail sticky top-6 hidden h-[calc(100vh-3rem)] w-[260px] shrink-0 flex-col rounded-[28px] px-4 py-4 md:flex">
-        <div className="flex items-center gap-3 rounded-[24px] border border-slate-200/70 bg-slate-50/80 px-4 py-4">
+      <aside className="app-rail sticky top- hidden h-[calc(100vh-3rem)] w-65 shrink-0 flex-col rounded-[28px] px-4 py-4 md:flex">
+        <div className="flex items-center gap-3 rounded-3xl border border-slate-200/70 bg-slate-50/80 px-4 py-4">
           <div className="grid h-12 w-12 place-items-center rounded-2xl bg-slate-900 text-sm font-semibold text-white shadow-lg shadow-slate-900/20">
             S
           </div>

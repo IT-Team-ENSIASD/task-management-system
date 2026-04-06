@@ -67,7 +67,7 @@
 
   /* Cards */
   .card {
-    @apply rounded-[24px] border border-slate-200/70 bg-white/90 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition-shadow duration-200;
+    @apply rounded-3xl border border-slate-200/70 bg-white/90 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition-shadow duration-200;
   }
 
   .card-lg {
@@ -202,7 +202,7 @@ body {
 }
 
 .app-panel {
-  @apply rounded-[28px] border border-slate-200/80 bg-white/90 shadow-[0_12px_40px_rgba(15,23,42,0.06)];
+  @apply h-screen rounded-[28px] border border-slate-200/80 bg-white/90 shadow-[0_12px_40px_rgba(15,23,42,0.06)];
 }
 
 .soft-card {
@@ -218,11 +218,11 @@ body {
 }
 
 .metric-surface {
-  @apply rounded-[24px] border border-white/70 bg-white/85 p-5 shadow-[0_10px_32px_rgba(15,23,42,0.06)];
+  @apply rounded-[24px] border-b border-slate-200/70 bg-white/85 p-5 ;
 }
 
 .detail-strip {
-  @apply rounded-[24px] border border-slate-200/70 bg-gradient-to-r from-[#efe6ff] via-white to-[#daeafe] p-5 shadow-[0_10px_30px_rgba(15,23,42,0.06)];
+  @apply rounded-3xl border border-slate-200/70 bg-gradient-to-r from-[#efe6ff] via-white to-[#daeafe] p-5 shadow-[0_10px_30px_rgba(15,23,42,0.06)];
 }
 
 .nav-pill {
