@@ -2,17 +2,15 @@
  * api.ts — Central API client for the Multi-Cloud Task System
  */
 
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-// Directly put your URLs here
-const BASE_TASK = isLocal
+// Detect if we are in development mode (npm run dev)
+const isDev = import.meta.env.DEV;
+// Use your Railway URL for production, and localhost for development
+const BASE_TASK = isDev
   ? 'http://localhost:3000'
-  : 'https://task-service-backend-production.up.railway.app'; // Your Railway URL
-
-const BASE_NOTIF = isLocal
+  : 'https://task-service-backend-production.up.railway.app';
+const BASE_NOTIF = isDev
   ? 'http://localhost:3001'
-  : 'https://0139-105-69-85-28.ngrok-free.app'; // Your Render URL
-
+  : 'https://0139-105-69-85-28.ngrok-free.app';
 
 
 async function request<T>(base: string, path: string, options: RequestInit = {}): Promise<T> {
