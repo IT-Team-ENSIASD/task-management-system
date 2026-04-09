@@ -32,7 +32,6 @@ export const reminderHourOptions = [
 export const notificationFrequencyOptions = [
   { value: 'immediate', label: 'Immediate' },
   { value: 'daily_digest', label: 'Daily digest' },
-  { value: 'weekly_digest', label: 'Weekly digest' },
   { value: 'off', label: 'Off' },
 ];
 

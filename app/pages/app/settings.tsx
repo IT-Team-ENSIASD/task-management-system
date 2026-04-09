@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { AppLayout } from '../../components/layout';
 import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Input, Select } from '../../components/common';
 import {
@@ -7,29 +8,105 @@ import {
   notificationFrequencyOptions,
   reminderHourOptions,
   settingsTabs,
-  teamMembers,
 } from '../../data/settings-data';
+import { getUser, logout, saveUser } from '../../auth';
+import { usersApi, prefApi, type ApiUser, type ApiPreferences } from '../../api';
 
 export default function SettingsPage() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<ApiUser | null>(null);
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'security'>('profile');
   const [savedMessage, setSavedMessage] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const [profile, setProfile] = useState(defaultProfileData);
+  const [profile, setProfile] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+  });
 
-  const [preferences, setPreferences] = useState(defaultPreferencesData);
+  const [preferences, setPreferences] = useState({
+    emailOnTaskAssigned: true,
+    emailOnTaskCompleted: true,
+    dailySummary: false,
+    weeklySummary: false,
+    reminderHoursBefore: 24,
+    notificationFrequency: 'immediate' as ApiPreferences['notificationFrequency'],
+  });
+
+  useEffect(() => {
+    const currentUser = getUser();
+    if (!currentUser) {
+      navigate('/auth/login', { replace: true });
+      return;
+    }
+    setUser(currentUser);
+    setProfile({
+      fullName: currentUser.username,
+      email: currentUser.email,
+      phone: '',
+    });
+
+    // Fetch preferences from Notification Service (Cloud B)
+    prefApi.get(currentUser.id)
+      .then(res => {
+        if (res.success && res.data) {
+          setPreferences({
+            emailOnTaskAssigned: res.data.emailOnTaskAssigned,
+            emailOnTaskCompleted: res.data.emailOnTaskCompleted,
+            dailySummary: res.data.dailySummary,
+            weeklySummary: res.data.weeklySummary,
+            reminderHoursBefore: res.data.reminderHoursBefore,
+            notificationFrequency: res.data.notificationFrequency,
+          });
+        }
+      })
+      .catch(err => console.error('Failed to fetch preferences', err));
+  }, [navigate]);
 
   const handleLogout = () => {
-    console.log('Logout');
+    logout();
+    navigate('/auth/login', { replace: true });
   };
 
-  const triggerSave = (section: string) => {
-    setSavedMessage(section);
-    window.setTimeout(() => setSavedMessage(''), 2000);
+  const triggerSave = async (section: string) => {
+    if (!user) return;
+    setSaving(true);
+    
+    try {
+      if (section === 'profile') {
+        const { user: updatedUser } = await usersApi.update(user.id, {
+          username: profile.fullName,
+          email: profile.email,
+        });
+        saveUser(updatedUser);
+        setUser(updatedUser);
+      } else if (section === 'notifications') {
+        await prefApi.update(user.id, {
+          emailOnTaskAssigned: preferences.emailOnTaskAssigned,
+          emailOnTaskCompleted: preferences.emailOnTaskCompleted,
+          dailySummary: preferences.dailySummary,
+          weeklySummary: preferences.weeklySummary,
+          reminderHoursBefore: preferences.reminderHoursBefore,
+          notificationFrequency: preferences.notificationFrequency,
+        });
+      }
+      
+      setSavedMessage(section);
+      setTimeout(() => setSavedMessage(''), 2000);
+    } catch (err: unknown) {
+      console.error(`Failed to save ${section}`, err);
+      alert(err instanceof Error ? err.message : `Failed to save ${section}`);
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const initials = user?.username ? user.username.substring(0, 2).toUpperCase() : 'JD';
 
   return (
     <AppLayout
-      userName="John Doe"
+      userName={user?.username ?? 'User'}
       onLogout={handleLogout}
       headerProps={{
         title: 'Settings',
@@ -42,12 +119,12 @@ export default function SettingsPage() {
         <aside className="app-pane overflow-hidden ">
           <div className="rounded-[26px] border border-slate-200/70 bg-linear-to-br from-[#f8f3ff] to-[#eef4ff] p-5">
             <div className="flex items-center gap-4">
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white text-slate-900 shadow-sm">
-                JD
+              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white text-slate-900 shadow-sm font-semibold">
+                {initials}
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-900">John Doe</p>
-                <p className="text-xs text-slate-500">Product lead</p>
+                <p className="text-sm font-semibold text-slate-900">{user?.username ?? 'User'}</p>
+                <p className="text-xs text-slate-500">Member</p>
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -93,7 +170,7 @@ export default function SettingsPage() {
               <CardBody className="space-y-5">
                 <div className="flex items-center gap-5 rounded-[24px] border border-slate-200/70 bg-slate-50/80 p-5">
                   <div className="grid h-20 w-20 place-items-center rounded-[26px] bg-linear-to-br from-slate-900 to-slate-600 text-xl font-semibold text-white shadow-lg shadow-slate-900/10">
-                    JD
+                    {initials}
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-slate-900">Profile photo</p>
@@ -106,7 +183,7 @@ export default function SettingsPage() {
 
                 <div className="grid gap-5 md:grid-cols-2">
                   <Input
-                    label="Full name"
+                    label="Username"
                     value={profile.fullName}
                     onChange={(e) => setProfile((current) => ({ ...current, fullName: e.target.value }))}
                   />
@@ -126,8 +203,14 @@ export default function SettingsPage() {
               </CardBody>
               <CardFooter>
                 <span className="text-sm text-slate-500">Keep this information up to date.</span>
-                <Button variant="primary" size="md" className="rounded-full px-5" onClick={() => triggerSave('profile')}>
-                  Save changes
+                <Button 
+                  variant="primary" 
+                  size="md" 
+                  className="rounded-full px-5" 
+                  onClick={() => triggerSave('profile')}
+                  isLoading={saving}
+                >
+                  {saving ? 'Saving...' : 'Save changes'}
                 </Button>
               </CardFooter>
             </Card>
@@ -136,9 +219,12 @@ export default function SettingsPage() {
           {activeTab === 'notifications' && (
             <div className="space-y-6">
               <Card className="soft-card border-0">
-                <CardHeader>
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Alerts</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">Notification preferences</h2>
+                <CardHeader className="flex items-center justify-between border-slate-200/70">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Alerts</p>
+                    <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">Notification preferences</h2>
+                  </div>
+                  {savedMessage === 'notifications' && <Badge variant="success">Saved</Badge>}
                 </CardHeader>
                 <CardBody className="space-y-4">
                   <Checkbox
@@ -172,21 +258,27 @@ export default function SettingsPage() {
                 <CardBody className="grid gap-5 md:grid-cols-2">
                   <Select
                     label="Reminder hours before deadline"
-                    value={preferences.reminderHours}
-                    onChange={(e) => setPreferences((current) => ({ ...current, reminderHours: e.target.value }))}
+                    value={String(preferences.reminderHoursBefore)}
+                    onChange={(e) => setPreferences((current) => ({ ...current, reminderHoursBefore: parseInt(e.target.value, 10) }))}
                     options={reminderHourOptions}
                   />
                   <Select
                     label="Notification frequency"
                     value={preferences.notificationFrequency}
-                    onChange={(e) => setPreferences((current) => ({ ...current, notificationFrequency: e.target.value }))}
-                    options={notificationFrequencyOptions}
+                    onChange={(e) => setPreferences((current) => ({ ...current, notificationFrequency: e.target.value as ApiPreferences['notificationFrequency'] }))}
+                    options={notificationFrequencyOptions.filter(o => o.value !== 'weekly_digest')}
                   />
                 </CardBody>
                 <CardFooter>
-                  <span className="text-sm text-slate-500">Notification rules are stored per user and checked before dispatch.</span>
-                  <Button variant="primary" size="md" className="rounded-full px-5" onClick={() => triggerSave('notifications')}>
-                    Save preferences
+                  <span className="text-sm text-slate-500">Notification rules are stored in the Notification Service (Cloud B).</span>
+                  <Button 
+                    variant="primary" 
+                    size="md" 
+                    className="rounded-full px-5" 
+                    onClick={() => triggerSave('notifications')}
+                    isLoading={saving}
+                  >
+                    {saving ? 'Saving...' : 'Save preferences'}
                   </Button>
                 </CardFooter>
               </Card>

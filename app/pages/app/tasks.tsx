@@ -300,7 +300,11 @@ export default function TasksPage() {
                   <p className="text-slate-500 text-sm max-w-sm">
                     {hasFilters ? "Try adjusting your filters." : "Create your first task to get started."}
                   </p>
-                  {hasFilters && <Button variant="outline" onClick={clearFilters} className="mt-4 rounded-lg">Clear all filters</Button>}
+                  {hasFilters && (
+                    <Button variant="outline" onClick={clearFilters} className="mt-4 rounded-lg">
+                      Clear all filters
+                    </Button>
+                  )}
                 </div>
               ) : (
                 filteredTasks.map((task) => {

@@ -92,6 +92,11 @@ export const tasksApi = {
 export const usersApi = {
   getAll: () => request<{ success: boolean; users: ApiUser[] }>(BASE_TASK, '/api/users'),
   getById: (id: number) => request<{ success: boolean; user: ApiUser }>(BASE_TASK, `/api/users/${id}`),
+  update: (id: number, data: { username?: string; email?: string }) =>
+    request<{ success: boolean; user: ApiUser }>(BASE_TASK, `/api/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
 };
 
 /* ─── Notifications (Cloud B) ─────────────────────────────────────────── */
@@ -123,4 +128,26 @@ export const notifApi = {
     request<{ success: boolean; updated: number }>(BASE_NOTIF, `/api/notifications/read-all/${userId}`, { method: 'PUT' }),
   delete: (id: number) =>
     request<{ success: boolean; message: string }>(BASE_NOTIF, `/api/notifications/${id}`, { method: 'DELETE' }),
+};
+
+/* ─── Preferences (Cloud B) ─────────────────────────────────────────── */
+
+export interface ApiPreferences {
+  userId: number;
+  emailOnTaskAssigned: boolean;
+  emailOnTaskCompleted: boolean;
+  reminderHoursBefore: number;
+  dailySummary: boolean;
+  weeklySummary: boolean;
+  notificationFrequency: 'immediate' | 'daily_digest' | 'off';
+}
+
+export const prefApi = {
+  get: (userId: number) =>
+    request<{ success: boolean; data: ApiPreferences }>(BASE_NOTIF, `/api/preferences/${userId}`),
+  update: (userId: number, data: Partial<ApiPreferences>) =>
+    request<{ success: boolean; message: string; data: ApiPreferences }>(BASE_NOTIF, `/api/preferences/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
 };
