@@ -2,8 +2,18 @@
  * api.ts — Central API client for the Multi-Cloud Task System
  */
 
-const BASE_TASK = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
-const BASE_NOTIF = import.meta.env.VITE_NOTIF_API_URL ?? 'http://localhost:3001';
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// Directly put your URLs here
+const BASE_TASK = isLocal
+  ? 'http://localhost:3000'
+  : 'https://task-service-backend-production.up.railway.app'; // Your Railway URL
+
+const BASE_NOTIF = isLocal
+  ? 'http://localhost:3001'
+  : 'https://0139-105-69-85-28.ngrok-free.app'; // Your Render URL
+
+
 
 async function request<T>(base: string, path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${base}${path}`, {
@@ -65,10 +75,10 @@ export interface TasksFilter {
 export const tasksApi = {
   getAll: (filters: TasksFilter = {}) => {
     const params = new URLSearchParams();
-    if (filters.status)     params.set('status',     filters.status);
-    if (filters.priority)   params.set('priority',   filters.priority);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.priority) params.set('priority', filters.priority);
     if (filters.assignedTo) params.set('assignedTo', String(filters.assignedTo));
-    if (filters.creatorId)  params.set('creatorId',  String(filters.creatorId));
+    if (filters.creatorId) params.set('creatorId', String(filters.creatorId));
     return request<{ success: boolean; tasks: ApiTask[]; count: number }>(BASE_TASK, `/api/tasks?${params.toString()}`);
   },
   getById: (id: number) =>
