@@ -15,7 +15,11 @@ const BASE_NOTIF = isDev
 
 async function request<T>(base: string, path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${base}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+      ...options.headers
+    },
     ...options,
   });
   const json = await res.json().catch(() => ({}));
