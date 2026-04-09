@@ -10,7 +10,7 @@ const BASE_TASK = isDev
   : 'https://task-service-backend-production.up.railway.app';
 const BASE_NOTIF = isDev
   ? 'http://localhost:3001'
-  : 'https://0139-105-69-85-28.ngrok-free.app';
+  : 'https://37fe-105-69-85-28.ngrok-free.app';
 
 
 async function request<T>(base: string, path: string, options: RequestInit = {}): Promise<T> {
