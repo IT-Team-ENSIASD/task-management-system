@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { Button, Card, CardBody, Checkbox, Input } from '../../components/common';
-import { ArrowUpRightIcon, CheckIcon, ShieldIcon, SparklesIcon } from '../../components/icons';
+import { ArrowUpRightIcon, SparklesIcon } from '../../components/icons';
+import { authApi } from '../../api';
+import { saveUser } from '../../auth';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -11,13 +14,10 @@ export default function LoginPage() {
 
   const validateForm = () => {
     const nextErrors: Record<string, string> = {};
-
     if (!email) nextErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(email)) nextErrors.email = 'Email is invalid';
-
     if (!password) nextErrors.password = 'Password is required';
     else if (password.length < 6) nextErrors.password = 'Password must be at least 6 characters';
-
     return nextErrors;
   };
 
@@ -34,7 +34,11 @@ export default function LoginPage() {
     setErrors({});
 
     try {
-      await new Promise((resolve) => window.setTimeout(resolve, 900));
+      const { user } = await authApi.login(email, password);
+      saveUser(user);
+      navigate('/app/dashboard', { replace: true });
+    } catch (err: unknown) {
+      setErrors({ general: err instanceof Error ? err.message : 'Login failed. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -94,8 +98,6 @@ export default function LoginPage() {
                   {isLoading ? 'Signing in...' : 'Sign in to TaskHub'}
                 </Button>
               </form>
-
-              
 
               <div className="mt-8 rounded-[22px] border border-slate-200/70 bg-slate-50/80 p-4 text-sm text-slate-600">
                 New here?{' '}

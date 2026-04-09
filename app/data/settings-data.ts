@@ -19,7 +19,7 @@ export const settingsTabs = [
   { id: 'profile', label: 'Profile', icon: UserIcon },
   { id: 'notifications', label: 'Notifications', icon: BellIcon },
   { id: 'security', label: 'Security', icon: ShieldIcon },
-  { id: 'team', label: 'Team', icon: SettingsIcon },
+  // { id: 'team', label: 'Team', icon: SettingsIcon },
 ] as const;
 
 export const reminderHourOptions = [

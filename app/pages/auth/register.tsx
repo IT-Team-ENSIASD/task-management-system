@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { Button, Card, CardBody, Checkbox, Input } from '../../components/common';
-import { ArrowUpRightIcon, CheckIcon, ShieldIcon, SparklesIcon } from '../../components/icons';
+import { ArrowUpRightIcon, SparklesIcon } from '../../components/icons';
+import { authApi } from '../../api';
+import { saveUser } from '../../auth';
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    fullName: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -16,15 +19,13 @@ export default function RegisterPage() {
 
   const validateForm = () => {
     const nextErrors: Record<string, string> = {};
-
-    if (!formData.fullName.trim()) nextErrors.fullName = 'Full name is required';
+    if (!formData.username.trim()) nextErrors.username = 'Username is required';
     if (!formData.email) nextErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) nextErrors.email = 'Email is invalid';
     if (!formData.password) nextErrors.password = 'Password is required';
     else if (formData.password.length < 8) nextErrors.password = 'Password must be at least 8 characters';
     if (formData.password !== formData.confirmPassword) nextErrors.confirmPassword = 'Passwords do not match';
     if (!formData.agreeToTerms) nextErrors.agreeToTerms = 'You must agree to the terms';
-
     return nextErrors;
   };
 
@@ -49,7 +50,11 @@ export default function RegisterPage() {
     setErrors({});
 
     try {
-      await new Promise((resolve) => window.setTimeout(resolve, 900));
+      const { user } = await authApi.register(formData.username, formData.email, formData.password);
+      saveUser(user);
+      navigate('/app/dashboard', { replace: true });
+    } catch (err: unknown) {
+      setErrors({ general: err instanceof Error ? err.message : 'Registration failed. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +76,6 @@ export default function RegisterPage() {
 
               <div className="mb-4">
                 <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Create your workspace</h2>
-                {/* <p className="mt-3 text-sm leading-7 text-slate-500">Register once and keep your tasks, notifications, and reports in one place.</p> */}
               </div>
 
               {errors.general && (
@@ -82,12 +86,12 @@ export default function RegisterPage() {
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <Input
-                  label="Full name"
-                  name="fullName"
-                  placeholder="John Doe"
-                  value={formData.fullName}
+                  label="Username"
+                  name="username"
+                  placeholder="johndoe"
+                  value={formData.username}
                   onChange={handleChange}
-                  error={errors.fullName}
+                  error={errors.username}
                 />
                 <Input
                   label="Email address"
@@ -98,26 +102,26 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   error={errors.email}
                 />
-                <div className='flex'>
-                    <Input
-                      label="Password"
-                      name="password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={formData.password}
-                      onChange={handleChange}
-                      error={errors.password}
-                      helperText="At least 8 characters with uppercase, lowercase, and numbers."
-                    />
-                    <Input
-                      label="Confirm password"
-                      name="confirmPassword"
-                      type="password"
-                      placeholder="••••••••"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      error={errors.confirmPassword}
-                    />
+                <div className='flex gap-4'>
+                  <Input
+                    label="Password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    error={errors.password}
+                    helperText="At least 8 characters."
+                  />
+                  <Input
+                    label="Confirm password"
+                    name="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    error={errors.confirmPassword}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -134,7 +138,6 @@ export default function RegisterPage() {
                   {isLoading ? 'Creating account...' : 'Create workspace account'}
                 </Button>
               </form>
-
 
               <div className="mt-8 rounded-[22px] border border-slate-200/70 bg-slate-50/80 p-4 text-sm text-slate-600">
                 Already have an account?{' '}

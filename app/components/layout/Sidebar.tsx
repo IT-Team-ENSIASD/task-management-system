@@ -39,11 +39,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout, userName = 'User' })
         to={href}
         onClick={() => setIsOpen(false)}
         aria-label={label}
-        className={`group flex items-center gap-3 rounded-[22px] transition-all duration-200 ${
-          isDesktopRail
-            ? `w-full px-4 py-3 justify-start ${active ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/15' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`
-            : `px-4 py-3 ${active ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/15' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`
-        }`}
+        className={`group flex items-center gap-3 rounded-[22px] transition-all duration-200 ${isDesktopRail
+          ? `w-full px-4 py-3 justify-start ${active ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/15' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`
+          : `px-4 py-3 ${active ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/15' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`
+          }`}
       >
         <Icon size={20} className="shrink-0" />
         <span className={`${isDesktopRail ? 'text-sm font-medium' : 'text-sm font-medium'}`}>{label}</span>
@@ -77,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout, userName = 'User' })
         <div className="mt-4 rounded-[22px] border border-slate-200/70 bg-gradient-to-br from-[#f8f3ff] to-[#eef4ff] p-3">
           <div className="flex items-center gap-3">
             <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-slate-900 shadow-sm">
-            <UserIcon size={18} />
+              <UserIcon size={18} />
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-slate-900">{userName}</p>
@@ -107,9 +106,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout, userName = 'User' })
 
       {/* Mobile sheet */}
       <aside
-        className={`fixed left-0 top-0 z-40 h-screen w-[290px] border-r border-slate-200/70 bg-white/95 text-slate-900 shadow-2xl shadow-slate-900/10 transition-transform duration-300 md:hidden ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed left-0 top-0 z-40 h-screen w-[290px] border-r border-slate-200/70 bg-white/95 text-slate-900 shadow-2xl shadow-slate-900/10 transition-transform duration-300 md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex h-full flex-col p-4">
           <div className="flex items-center gap-3 rounded-[24px] border border-slate-200/70 bg-slate-50/80 px-4 py-4">

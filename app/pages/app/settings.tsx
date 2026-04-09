@@ -11,7 +11,7 @@ import {
 } from '../../data/settings-data';
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'security' | 'team'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'security'>('profile');
   const [savedMessage, setSavedMessage] = useState('');
 
   const [profile, setProfile] = useState(defaultProfileData);
@@ -36,10 +36,11 @@ export default function SettingsPage() {
         subtitle: 'Fine tune your workspace, alerts, and account preferences.',
         showSearch: false,
       }}
+
     >
-      <div className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
-        <aside className="app-panel overflow-hidden p-4">
-          <div className="rounded-[26px] border border-slate-200/70 bg-gradient-to-br from-[#f8f3ff] to-[#eef4ff] p-5">
+      <div className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr] h-0.5">
+        <aside className="app-pane overflow-hidden ">
+          <div className="rounded-[26px] border border-slate-200/70 bg-linear-to-br from-[#f8f3ff] to-[#eef4ff] p-5">
             <div className="flex items-center gap-4">
               <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white text-slate-900 shadow-sm">
                 JD
@@ -64,11 +65,10 @@ export default function SettingsPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex w-full items-center gap-3 rounded-[22px] px-4 py-4 text-left transition-all duration-200 ${
-                    active
-                      ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10'
-                      : 'border border-transparent bg-white text-slate-600 hover:border-slate-200 hover:bg-slate-50'
-                  }`}
+                  className={`flex w-full items-center gap-3 rounded-[22px] px-4 py-4 text-left transition-all duration-200 ${active
+                    ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10'
+                    : 'border border-transparent bg-white text-slate-600 hover:border-slate-200 hover:bg-slate-50'
+                    }`}
                 >
                   <span className={`grid h-10 w-10 place-items-center rounded-2xl ${active ? 'bg-white/10' : 'bg-slate-100'}`}>
                     <Icon size={18} />
@@ -92,7 +92,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardBody className="space-y-5">
                 <div className="flex items-center gap-5 rounded-[24px] border border-slate-200/70 bg-slate-50/80 p-5">
-                  <div className="grid h-20 w-20 place-items-center rounded-[26px] bg-gradient-to-br from-slate-900 to-slate-600 text-xl font-semibold text-white shadow-lg shadow-slate-900/10">
+                  <div className="grid h-20 w-20 place-items-center rounded-[26px] bg-linear-to-br from-slate-900 to-slate-600 text-xl font-semibold text-white shadow-lg shadow-slate-900/10">
                     JD
                   </div>
                   <div className="flex-1">
@@ -229,7 +229,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {activeTab === 'team' && (
+          {/* {activeTab === 'team' && (
             <Card className="soft-card border-0">
               <CardHeader>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Team</p>
@@ -254,7 +254,7 @@ export default function SettingsPage() {
                 <Button variant="primary" size="md" className="rounded-full px-5">Invite member</Button>
               </CardFooter>
             </Card>
-          )}
+          )} */}
         </div>
       </div>
     </AppLayout>

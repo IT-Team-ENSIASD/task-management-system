@@ -1,4 +1,4 @@
-﻿import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { AppLayout } from '../../components/layout';
 import { Badge, Button, Card, CardBody } from '../../components/common';
@@ -11,7 +11,8 @@ import {
   SettingsIcon,
   SparklesIcon,
 } from '../../components/icons';
-import { dashboardMetricCards } from '../../data/dashboard-data';
+import { tasksApi, type ApiTask, type ApiUser } from '../../api';
+import { getUser, logout } from '../../auth';
 
 const quickActions = [
   {
@@ -42,32 +43,58 @@ const quickActions = [
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const [user, setUser] = useState<ApiUser | null>(null);
+  const [tasks, setTasks] = useState<ApiTask[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setUser(getUser());
+    tasksApi.getAll().then((res) => {
+      setTasks(res.tasks);
+    }).catch(console.error).finally(() => setLoading(false));
+  }, []);
+
+  const stats = useMemo(() => {
+    const total = tasks.length;
+    const completed = tasks.filter((t) => t.status === 'completed').length;
+    const inProgress = tasks.filter((t) => t.status === 'in_progress').length;
+    const overdue = tasks.filter(
+      (t) => t.deadline && new Date(t.deadline) < new Date() && t.status !== 'completed' && t.status !== 'archived'
+    ).length;
+    return { total, completed, inProgress, overdue };
+  }, [tasks]);
+
+  const metricCards = useMemo(
+    () => [
+      { label: 'Total tasks', value: loading ? '…' : String(stats.total), iconKey: 'sparkles' as const },
+      { label: 'Completed', value: loading ? '…' : String(stats.completed), iconKey: 'check' as const },
+      { label: 'In Progress', value: loading ? '…' : String(stats.inProgress), iconKey: 'calendar' as const },
+    ],
+    [loading, stats]
+  );
 
   const handleAction = (actionId: (typeof quickActions)[number]['id']) => {
-    if (actionId === 'settings') {
-      navigate('/app/settings');
-      return;
-    }
-
+    if (actionId === 'settings') { navigate('/app/settings'); return; }
     navigate('/app/tasks');
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth/login', { replace: true });
   };
 
   const statusIndicators = useMemo(
     () => [
-      { label: 'Task Service', state: 'Ready', variant: 'success' as const },
-      { label: 'Notification Service', state: 'Pending integration', variant: 'warning' as const },
-      { label: 'Cross-cloud Sync', state: 'Planned', variant: 'neutral' as const },
+      { label: 'Task Service (Cloud A)', state: 'Connected', variant: 'success' as const },
+      { label: 'Notification Service (Cloud B)', state: 'Integrated', variant: 'success' as const },
+      { label: 'Cross-cloud Sync', state: `${stats.overdue} overdue`, variant: stats.overdue > 0 ? 'warning' as const : 'neutral' as const },
     ],
-    []
+    [stats.overdue]
   );
-
-  const handleLogout = () => {
-    console.log('Logout');
-  };
 
   return (
     <AppLayout
-      userName="John Doe"
+      userName={user?.username ?? 'User'}
       onLogout={handleLogout}
       headerProps={{
         title: 'Dashboard',
@@ -76,7 +103,7 @@ export default function DashboardPage() {
       }}
     >
       <div className="mb-6 grid gap-4 md:grid-cols-3">
-        {dashboardMetricCards.map((item) => (
+        {metricCards.map((item) => (
           <Card key={item.label} className="metric-surface">
             <CardBody className="p-0">
               <div className="flex items-center justify-between">
@@ -109,7 +136,6 @@ export default function DashboardPage() {
           <div className="mt-5 grid gap-4">
             {quickActions.map((action) => {
               const Icon = action.icon;
-
               return (
                 <Card key={action.id} className="soft-card border border-slate-200/70">
                   <CardBody className="px-5 py-4">
@@ -144,8 +170,7 @@ export default function DashboardPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Build focus</p>
           <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">Multi-cloud progress</h3>
           <p className="mt-3 text-sm leading-6 text-slate-600">
-            This dashboard stays intentionally minimal while implementation moves to service integration,
-            resilience, and cross-cloud event flows.
+            Live stats from Cloud A (PostgreSQL) — logged in as <strong>{user?.username}</strong>.
           </p>
 
           <div className="mt-5 space-y-3">

@@ -6,3 +6,4 @@ export { TextArea } from './TextArea';
 export { Select } from './Select';
 export { Checkbox } from './Checkbox';
 export { Modal } from './Modal';
+export { Toast, ToastContainer } from './Toast';
