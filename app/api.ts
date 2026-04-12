@@ -4,13 +4,15 @@
 
 // Detect if we are in development mode (npm run dev)
 const isDev = import.meta.env.DEV;
-// Use your Railway URL for production, and localhost for development
+
+// Use import.meta.env for production URLs, with fallbacks
 const BASE_TASK = isDev
   ? 'http://localhost:3000'
-  : 'https://task-service-backend-production.up.railway.app';
+  : (import.meta.env.VITE_BASE_TASK);
+
 const BASE_NOTIF = isDev
   ? 'http://localhost:3001'
-  : 'https://37fe-105-69-85-28.ngrok-free.app';
+  : (import.meta.env.VITE_BASE_NOTIF);
 
 
 async function request<T>(base: string, path: string, options: RequestInit = {}): Promise<T> {
